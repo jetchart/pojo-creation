@@ -146,6 +146,7 @@ public class Main {
     }
 
     private static String getLength(String type, List<String> argumentsStringList) {
+        //Do this if long too?
         if (!type.equals("String"))
             return "";
         return ", length = " + argumentsStringList.get(0);
@@ -194,16 +195,19 @@ public class Main {
 
     private static String getType(ColDataType colType) {
         String type = colType.getDataType().toUpperCase();
-        //System.out.println(colType.getArgumentsStringList());
         if (type.equals("VARCHAR"))
             return "String";
         if (type.equals("CHAR"))
             return "String";
         if (type.equals("TIMESTAMP"))
             return "Date";
+        if (type.equals("DATE"))
+            return "Date";
         if (type.equals("INT"))
             return "Integer";
         if (type.equals("LONG"))
+            return "Long";
+        if (type.equals("BIGINT"))
             return "Long";
         if (type.equals("DECIMAL"))
             return "BigDecimal";
