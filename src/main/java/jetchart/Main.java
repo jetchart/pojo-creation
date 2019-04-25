@@ -8,22 +8,52 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.Index;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-        /* SQL File path (required) */
-        String pathFrom = args[0];
+        /* SQL File path (optional) */
+        String pathFrom = getPathFrom(args);
+        System.out.println("Path from: " + pathFrom);
         /* Folder target (optional) */
-        String pathTo = args[1] != null? args[1] : "./";
+        String pathTo = getPathTo(args);
+        System.out.println("Path to: " + pathTo);
+        /* Find files to parse */
+        List<String> filesPath = findFiles(pathFrom);
+        System.out.println("Files to parse: " + filesPath);
+        /* Create POJOS */
+        filesPath.forEach(filePath -> createPOJO(filePath, pathTo));
+    }
 
-        createPOJO(pathFrom, pathTo);
+    private static String getPathTo(String[] args) {
+        return args != null && args.length > 1 && args[1] != null? args[1] : "./";
+    }
+
+    private static String getPathFrom(String[] args) {
+        return args != null && args.length > 0 && args[0] != null? args[0] : "./";
+    }
+
+    private static List<String> findFiles(String path) {
+        List<String> files = new ArrayList<>();
+        File absolutePath = new File(path);
+        if (absolutePath.isDirectory()) {
+            files = Arrays.stream(Objects.requireNonNull(absolutePath.listFiles()))
+                    .map(File::getAbsolutePath).collect(Collectors.toList())
+                    .stream().filter(name -> name.endsWith(".sql")).collect(Collectors.toList());
+        } else {
+            files.add(path);
+        }
+        return files;
     }
 
     private static void createPOJO(String pathFrom, String pathTo) {
@@ -37,6 +67,7 @@ public class Main {
 
             Statement createTable = CCJSqlParserUtil.parse(createSQL);
             String tableName = ((CreateTable) createTable).getTable().getName();
+            System.out.println("Parsing: " + tableName);
             List<String> keys = getPrimaryKey(((CreateTable) createTable).getIndexes());
             List<String> foreignsKey = getForeignsKey(((CreateTable) createTable).getIndexes());
 
@@ -65,9 +96,9 @@ public class Main {
 
             writeEndClassSection(pojo);
 
-            System.out.println(pojo);
-
-            writeFile(pathTo + convertToCamelCase(tableName, "_", true, "") + ".java", pojo.toString());
+            String fileName = convertToCamelCase(tableName, "_", true, "") + ".java";
+            writeFile(pathTo + fileName, pojo.toString());
+            System.out.println("POJO created: " + fileName);
 
         } catch (JSQLParserException e) {
             e.printStackTrace();
