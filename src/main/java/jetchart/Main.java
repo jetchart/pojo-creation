@@ -18,9 +18,17 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        String path = args[0];
+        /* SQL File path (required) */
+        String pathFrom = args[0];
+        /* Folder target (optional) */
+        String pathTo = args[1] != null? args[1] : "./";
+
+        createPOJO(pathFrom, pathTo);
+    }
+
+    private static void createPOJO(String pathFrom, String pathTo) {
         StringBuffer pojo = new StringBuffer();
-        String createSQL = readFile(path) ;
+        String createSQL = readFile(pathFrom) ;
 
         try {
 
@@ -59,7 +67,7 @@ public class Main {
 
             System.out.println(pojo);
 
-            writeFile("./" + convertToCamelCase(tableName, "_", true, "") + ".java", pojo.toString());
+            writeFile(pathTo + convertToCamelCase(tableName, "_", true, "") + ".java", pojo.toString());
 
         } catch (JSQLParserException e) {
             e.printStackTrace();
