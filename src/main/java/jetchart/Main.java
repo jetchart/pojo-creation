@@ -36,7 +36,7 @@ public class Main {
         if (args[0].toUpperCase().equals("POJO"))
             doPOJO(args[1], args[2]);
         if (args[0].toUpperCase().equals("ABM"))
-            ABMUtil.createABM(args[1], args[2], args[4], args[4], args[5]);
+            ABMUtil.createABM(args[1], args[2], args[3], args[4], args[5]);
     }
 
     private static void POJOptions() {
