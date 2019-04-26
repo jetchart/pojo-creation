@@ -63,6 +63,22 @@ public class POJOUtil {
         }
     }
 
+    public static Boolean existsValue(String value, Map<String, String> map) {
+        return map.values().stream().anyMatch(v -> v.equals(value));
+    }
+
+    public static String getClassNameNumber(String value, Map<String, String> map) {
+        if (!existsValue(value, map))
+            return value;
+        Integer i = 1;
+        while (existsValue(value, map)) {
+            i++;
+            value = value + i.toString();
+        }
+        return value;
+    }
+
+
     public static void writeGetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, ColumnDefinition col, String type, String className, String propertyName) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
