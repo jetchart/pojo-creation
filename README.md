@@ -1,5 +1,5 @@
 ### POJO Creation
-##### Tool to create POJO parsing a sql file.
+##### Tool to create POJOS parsing a sql file.
 
 **Program arguments:** `[0] [1]`<br>
 
