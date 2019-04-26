@@ -10,6 +10,14 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("Example command line to create POJO: pojo /home/jetchart/person.sql /home/jetchart/pojos/");
+        System.out.println("Example command line to create ABM: abm Person PersonEntity PersonDto Long /home/jetchart/layers/ \n");
+
+        if (args != null && args[0] != null) {
+            commandLine(args);
+            return;
+        }
+
         System.out.println("Select one:");
         System.out.println("\t1. POJO");
         System.out.println("\t2. ABM");
@@ -24,13 +32,24 @@ public class Main {
             ABMOptions();
     }
 
+    private static void commandLine(String[] args) {
+        if (args[0].toUpperCase().equals("POJO"))
+            doPOJO(args[1], args[2]);
+        if (args[0].toUpperCase().equals("ABM"))
+            ABMUtil.createABM(args[1], args[2], args[4], args[4], args[5]);
+    }
+
     private static void POJOptions() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Path sql file or folder: ");
         String pathFrom = scanner.next();
         System.out.print("Target folder: ");
         String pathTo = scanner.next();
+        doPOJO(pathFrom, pathTo);
 
+    }
+
+    private static void doPOJO(String pathFrom, String pathTo) {
         /* Find files to parse */
         List<String> filesPath = FileUtil.findFiles(pathFrom);
         System.out.println("Files to parse: " + filesPath);

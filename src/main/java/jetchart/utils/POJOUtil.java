@@ -29,6 +29,7 @@ public class POJOUtil {
             System.out.println("Parsing: " + tableName);
             List<String> keys = getPrimaryKey(((CreateTable) createTable).getIndexes());
             Map<String, String> foreignsKey = getForeignsKey(((CreateTable) createTable).getIndexes());
+            Map<String, String> propertyNameforeignsKey = getPropertyNameForeignsKey(((CreateTable) createTable).getIndexes());
             writeHeaderClassSection(pojo, (CreateTable) createTable, tableName);
 
             /* Fields definition */
@@ -39,7 +40,7 @@ public class POJOUtil {
                 /* Write POJO */
                 writeIdAnnotation(pojo, keys, col);
                 writeNotNullableAnnotation(pojo, col);
-                writeFieldDefinition(pojo, foreignsKey, col, type, precisionScale, length);
+                writeFieldDefinition(pojo, foreignsKey, propertyNameforeignsKey, col, type, precisionScale, length);
             }
 
             /* Fields setter & getter */
@@ -48,8 +49,8 @@ public class POJOUtil {
                 String className = convertToCamelCase(col.getColumnName(), "_", true, "");
                 String propertyName = convertToCamelCase(col.getColumnName(), "_", false, "");
                 /* Write POJO */
-                writeGetterMethod(pojo, foreignsKey, col, type, className, propertyName);
-                writeSetterMethod(pojo, foreignsKey, col, type, className, propertyName);
+                writeGetterMethod(pojo, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
+                writeSetterMethod(pojo, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
             }
 
             writeEndClassSection(pojo);
@@ -79,11 +80,13 @@ public class POJOUtil {
     }
 
 
-    public static void writeGetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, ColumnDefinition col, String type, String className, String propertyName) {
+    public static void writeGetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
-            pojo.append("\tpublic ").append(referencesClassName).append("Entity get").append(className).append("() {\n");
-            pojo.append("\t\treturn this.").append(propertyName).append(";\n");
+            String propertyNameFKUpper = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", true, "");
+            String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
+            pojo.append("\tpublic ").append(referencesClassName).append("Entity get").append(propertyNameFKUpper).append("() {\n");
+            pojo.append("\t\treturn this.").append(propertyNameFKLower).append(";\n");
             pojo.append("\t}\n\n");
         } else {
             pojo.append("\tpublic ").append(type).append(" get").append(className).append("() {\n");
@@ -92,11 +95,13 @@ public class POJOUtil {
         }
     }
 
-    public static void writeSetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, ColumnDefinition col, String type, String className, String propertyName) {
+    public static void writeSetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
-            pojo.append("\tpublic void ").append("set").append(className).append(" (").append(referencesClassName).append("Entity ").append(propertyName).append(") {\n");
-            pojo.append("\t\tthis.").append(propertyName).append(" = ").append(propertyName).append(";\n");
+            String propertyNameFKUpper = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", true, "");
+            String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
+            pojo.append("\tpublic void ").append("set").append(propertyNameFKUpper).append(" (").append(referencesClassName).append("Entity ").append(propertyName).append(") {\n");
+            pojo.append("\t\tthis.").append(propertyNameFKLower).append(" = ").append(propertyNameFKLower).append(";\n");
             pojo.append("\t}\n\n");
         } else {
             pojo.append("\tpublic void ").append("set").append(className).append("(").append(type).append(" ").append(propertyName).append(") {\n");
@@ -109,12 +114,13 @@ public class POJOUtil {
         pojo.append("}");
     }
 
-    public static void writeFieldDefinition(StringBuffer pojo, Map<String, String> foreignsKey, ColumnDefinition col, String type, String precisionScale, String length) {
+    public static void writeFieldDefinition(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String precisionScale, String length) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
+            String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
             pojo.append("\t@ManyToOne\n");
             pojo.append("\t@JoinColumn(name = \"" + col.getColumnName() + "\")\n");
-            pojo.append("\tprivate ").append(referencesClassName).append("Entity ").append(convertToCamelCase(col.getColumnName(), "_", false, "")).append(";\n\n");
+            pojo.append("\tprivate ").append(referencesClassName).append("Entity ").append(propertyNameFKLower).append(";\n\n");
         } else {
             pojo.append("\t@Column(name = \"" + col.getColumnName() + "\"" + precisionScale + length + ")\n");
             pojo.append("\tprivate ").append(type).append(" ").append(convertToCamelCase(col.getColumnName(), "_", false, "")).append(";\n\n");
@@ -150,6 +156,17 @@ public class POJOUtil {
         for (Index index : indexes) {
             if (index.getType().toUpperCase().equals("FOREIGN KEY")) {
                 fkMap.put(index.getColumnsNames().get(0), getReferencesTable(index));
+            }
+        }
+        return fkMap;
+    }
+
+    public static Map<String, String> getPropertyNameForeignsKey(List<Index> indexes) {
+        Map<String, String> fkMap = new HashMap<>();
+        for (Index index : indexes) {
+            if (index.getType().toUpperCase().equals("FOREIGN KEY")) {
+                String propertyName = getClassNameNumber(getReferencesTable(index), fkMap);
+                fkMap.put(index.getColumnsNames().get(0), propertyName);
             }
         }
         return fkMap;
