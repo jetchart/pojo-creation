@@ -1,4 +1,4 @@
-package jetchart.template;
+package FILL_PACKAGE_PATH_HERE;
 
 import java.util.List;
 
