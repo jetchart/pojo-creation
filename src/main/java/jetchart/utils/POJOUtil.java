@@ -12,13 +12,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class POJOUtil {
 
     public static void createPOJO(String pathFrom, String pathTo) {
-        StringBuffer pojo = new StringBuffer();
-        String createSQL = FileUtil.readFile(pathFrom) ;
+        if (!pathTo.endsWith("/") && !pathTo.endsWith("\\"))
+            pathTo += "\\";
 
+        StringBuffer pojo = new StringBuffer();
+        String createSQL = parseCustom(FileUtil.readFile(pathFrom));
         try {
 
             writePackageSection(pojo);
@@ -40,7 +44,7 @@ public class POJOUtil {
                 /* Write POJO */
                 writeIdAnnotation(pojo, keys, col);
                 writeNotNullableAnnotation(pojo, col);
-                writeFieldDefinition(pojo, foreignsKey, propertyNameforeignsKey, col, type, precisionScale, length);
+                writeFieldDefinition(pojo, keys, foreignsKey, propertyNameforeignsKey, col, type, precisionScale, length);
             }
 
             /* Fields setter & getter */
@@ -49,8 +53,8 @@ public class POJOUtil {
                 String className = convertToCamelCase(col.getColumnName(), "_", true, "");
                 String propertyName = convertToCamelCase(col.getColumnName(), "_", false, "");
                 /* Write POJO */
-                writeGetterMethod(pojo, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
-                writeSetterMethod(pojo, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
+                writeGetterMethod(pojo, keys, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
+                writeSetterMethod(pojo, keys, foreignsKey, propertyNameforeignsKey, col, type, className, propertyName);
             }
 
             writeEndClassSection(pojo);
@@ -62,6 +66,44 @@ public class POJOUtil {
         } catch (JSQLParserException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String parseCustom(String createSQL) {
+        createSQL = createSQL.replaceAll("\"", "")
+                .replaceAll(" ENABLE,", ",")
+                .replaceAll("\\) ENABLE", ")");
+
+        if (createSQL.contains("USING INDEX")) {
+            Integer i = createSQL.indexOf("USING INDEX");
+            if (createSQL.indexOf(",", i) != -1) {
+                Integer comaIndex = createSQL.indexOf(",", i);
+                createSQL = createSQL.replace(createSQL.substring(i, comaIndex), "");
+            } else {
+                Integer comaIndex = createSQL.indexOf(";", i);
+                createSQL = createSQL.replace(createSQL.substring(i, comaIndex), ")");
+            }
+        }
+        if (createSQL.contains("PCTFREE")) {
+            Integer i = createSQL.indexOf("PCTFREE");
+            Integer comaIndex = createSQL.indexOf(";", i);
+            createSQL = createSQL.replace(createSQL.substring(i, comaIndex), "");
+        }
+        if (createSQL.contains("CREATE UNIQUE")) {
+            Integer i = createSQL.indexOf("CREATE UNIQUE");
+            Integer comaIndex = createSQL.indexOf(";", i);
+            createSQL = createSQL.replace(createSQL.substring(i, comaIndex + 1), "");
+        }
+        if (createSQL.contains("CREATE INDEX")) {
+            Integer i = createSQL.indexOf("CREATE INDEX");
+            Integer comaIndex = createSQL.indexOf(";", i);
+            createSQL = createSQL.replace(createSQL.substring(i, comaIndex + 1), "");
+        }
+        if (createSQL.contains("COMMENT ON")) {
+            Integer i = createSQL.indexOf("COMMENT ON");
+            Integer comaIndex = createSQL.indexOf(";", i);
+            createSQL = createSQL.replace(createSQL.substring(i, comaIndex + 1), "");
+        }
+        return createSQL;
     }
 
     public static Boolean existsValue(String value, Map<String, String> map) {
@@ -80,7 +122,7 @@ public class POJOUtil {
     }
 
 
-    public static void writeGetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
+    public static void writeGetterMethod(StringBuffer pojo, List<String> keys, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKUpper = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", true, "");
@@ -89,13 +131,16 @@ public class POJOUtil {
             pojo.append("\t\treturn this.").append(propertyNameFKLower).append(";\n");
             pojo.append("\t}\n\n");
         } else {
-            pojo.append("\tpublic ").append(type).append(" get").append(className).append("() {\n");
-            pojo.append("\t\treturn this.").append(propertyName).append(";\n");
+            Boolean isSingleKey = false;
+            if (keys.size() == 1 && keys.contains(col.getColumnName()))
+                isSingleKey = true;
+            pojo.append("\tpublic ").append(type).append(" get").append(isSingleKey? "Id" : className).append("() {\n");
+            pojo.append("\t\treturn this.").append(isSingleKey? "id" : propertyName).append(";\n");
             pojo.append("\t}\n\n");
         }
     }
 
-    public static void writeSetterMethod(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
+    public static void writeSetterMethod(StringBuffer pojo, List<String> keys, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String className, String propertyName) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKUpper = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", true, "");
@@ -104,8 +149,11 @@ public class POJOUtil {
             pojo.append("\t\tthis.").append(propertyNameFKLower).append(" = ").append(propertyNameFKLower).append(";\n");
             pojo.append("\t}\n\n");
         } else {
-            pojo.append("\tpublic void ").append("set").append(className).append("(").append(type).append(" ").append(propertyName).append(") {\n");
-            pojo.append("\t\tthis.").append(propertyName).append(" = ").append(propertyName).append(";\n");
+            Boolean isSingleKey = false;
+            if (keys.size() == 1 && keys.contains(col.getColumnName()))
+                isSingleKey = true;
+            pojo.append("\tpublic void ").append("set").append(isSingleKey? "Id" : className).append("(").append(type).append(" ").append(isSingleKey? "id" : propertyName).append(") {\n");
+            pojo.append("\t\tthis.").append(isSingleKey? "id" : propertyName).append(" = ").append(isSingleKey? "id" : propertyName).append(";\n");
             pojo.append("\t}\n\n");
         }
     }
@@ -114,7 +162,7 @@ public class POJOUtil {
         pojo.append("}");
     }
 
-    public static void writeFieldDefinition(StringBuffer pojo, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String precisionScale, String length) {
+    public static void writeFieldDefinition(StringBuffer pojo, List<String> keys, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String precisionScale, String length) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
@@ -122,8 +170,11 @@ public class POJOUtil {
             pojo.append("\t@JoinColumn(name = \"" + col.getColumnName() + "\")\n");
             pojo.append("\tprivate ").append(referencesClassName).append("Entity ").append(propertyNameFKLower).append(";\n\n");
         } else {
+            Boolean isSingleKey = false;
+            if (keys.size() == 1 && keys.contains(col.getColumnName()))
+                isSingleKey = true;
             pojo.append("\t@Column(name = \"" + col.getColumnName() + "\"" + precisionScale + length + ")\n");
-            pojo.append("\tprivate ").append(type).append(" ").append(convertToCamelCase(col.getColumnName(), "_", false, "")).append(";\n\n");
+            pojo.append("\tprivate ").append(type).append(" ").append(convertToCamelCase(isSingleKey? "id" : col.getColumnName(), "_", false, "")).append(";\n\n");
         }
     }
 
@@ -177,18 +228,18 @@ public class POJOUtil {
         table = table.substring(table.indexOf("REFERENCES") + "REFERENCES".length()).replaceAll(" ", "");
         Integer i = table.contains("(") ? table.indexOf("(") : table.length();
         table = table.substring(0, i);
-        return table;
+        return table.contains(".") ? table.split("\\.")[1] : table;
     }
 
     public static String getLength(String type, List<String> argumentsStringList) {
         //Do this if long too?
         if (!type.equals("String"))
             return "";
-        return ", length = " + argumentsStringList.get(0);
+        return ", length = " + argumentsStringList.get(0).replaceAll(" BYTE", "");
     }
 
     public static String getPrecisionScale(String type, List<String> argumentsStringList) {
-        if (!type.equals("BigDecimal") || argumentsStringList.size() != 2)
+        if ((!type.equals("BigDecimal") && !type.equals("Long"))|| argumentsStringList == null || argumentsStringList.size() != 2)
             return "";
         return ", precision = " + argumentsStringList.get(0) + ", scale = " + argumentsStringList.get(1);
     }
@@ -230,9 +281,9 @@ public class POJOUtil {
 
     public static String getType(ColDataType colType) {
         String type = colType.getDataType().toUpperCase();
-        if (type.equals("VARCHAR"))
+        if (type.startsWith("VARCHAR"))
             return "String";
-        if (type.equals("CHAR"))
+        if (type.startsWith("CHAR"))
             return "String";
         if (type.equals("TIMESTAMP"))
             return "Date";
@@ -246,6 +297,14 @@ public class POJOUtil {
             return "Long";
         if (type.equals("DECIMAL"))
             return "BigDecimal";
+        if (type.equals("NUMBER") && colType.getArgumentsStringList() != null && colType.getArgumentsStringList().size() > 1 && !colType.getArgumentsStringList().get(1).equals("0"))
+            return "BigDecimal";
+        if (type.equals("NUMBER") && colType.getArgumentsStringList() != null && colType.getArgumentsStringList().size() > 1 && colType.getArgumentsStringList().get(1).equals("0"))
+            return "Long";
+        if (type.equals("NUMBER") && colType.getArgumentsStringList() != null && colType.getArgumentsStringList().size() == 1)
+            return "Long";
+        if (type.equals("NUMBER") && colType.getArgumentsStringList() == null)
+            return "Long";
         return type;
     }
 

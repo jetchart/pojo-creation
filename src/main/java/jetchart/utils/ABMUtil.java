@@ -4,7 +4,7 @@ public class ABMUtil {
 
     public static void createABM(String name, String entity, String dto, String typeId, String folderTarget) {
         folderTarget = folderTarget == null || folderTarget.isEmpty() ? "./" : folderTarget;
-        folderTarget = folderTarget.endsWith("/") || folderTarget.endsWith("\\") ? folderTarget : folderTarget + "/";
+        folderTarget = folderTarget.endsWith("/") || folderTarget.endsWith("\\") ? folderTarget : folderTarget + "\\";
 
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         createLayer(name, entity, dto, typeId, classLoader, "Controller", folderTarget);
