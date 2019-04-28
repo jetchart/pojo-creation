@@ -144,7 +144,7 @@ public class POJOUtil {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKUpper = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
-            pojo.append("\tpublic void ").append("set").append(propertyNameFKUpper).append(" (").append(referencesClassName).append("Entity ").append(propertyName).append(") {\n");
+            pojo.append("\tpublic void ").append("set").append(propertyNameFKUpper).append(" (").append(referencesClassName).append("Entity ").append(propertyNameFKLower).append(") {\n");
             pojo.append("\t\tthis.").append(propertyNameFKLower).append(" = ").append(propertyNameFKLower).append(";\n");
             pojo.append("\t}\n\n");
         } else {
