@@ -39,12 +39,12 @@ public class POJOUtil {
             /* Fields definition */
             for (ColumnDefinition col: ((CreateTable) createTable).getColumnDefinitions()) {
                 String type = getType(col.getColDataType());
-                String precisionScale = getPrecisionScale(type, col.getColDataType().getArgumentsStringList());
-                String length = getLength(type, col.getColDataType().getArgumentsStringList());
                 /* Write POJO */
                 writeIdAnnotation(pojo, keys, col);
                 writeNotNullableAnnotation(pojo, col);
-                writeFieldDefinition(pojo, keys, foreignsKey, propertyNameforeignsKey, col, type, precisionScale, length);
+                writeSizeAnnotation(pojo, type, col.getColDataType().getArgumentsStringList());
+                writeDigitsAnnotation(pojo, type, col.getColDataType().getArgumentsStringList());
+                writeFieldDefinition(pojo, keys, foreignsKey, propertyNameforeignsKey, col, type);
             }
 
             /* Fields setter & getter */
@@ -67,7 +67,6 @@ public class POJOUtil {
             e.printStackTrace();
         }
     }
-
     private static String parseCustom(String createSQL) {
         createSQL = createSQL.replaceAll("\"", "")
                 .replaceAll(" ENABLE,", ",")
@@ -162,7 +161,7 @@ public class POJOUtil {
         pojo.append("}");
     }
 
-    public static void writeFieldDefinition(StringBuffer pojo, List<String> keys, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type, String precisionScale, String length) {
+    public static void writeFieldDefinition(StringBuffer pojo, List<String> keys, Map<String, String> foreignsKey, Map<String, String> propertyNameforeignsKey, ColumnDefinition col, String type) {
         if (foreignsKey.containsKey(col.getColumnName())) {
             String referencesClassName = convertToCamelCase(foreignsKey.get(col.getColumnName()), "_", true, "");
             String propertyNameFKLower = convertToCamelCase(propertyNameforeignsKey.get(col.getColumnName()), "_", false, "");
@@ -173,7 +172,7 @@ public class POJOUtil {
             Boolean isSingleKey = false;
             if (keys.size() == 1 && keys.contains(col.getColumnName()))
                 isSingleKey = true;
-            pojo.append("\t@Column(name = \"" + col.getColumnName() + "\"" + precisionScale + length + ")\n");
+            pojo.append("\t@Column(name = \"" + col.getColumnName() + "\"" + ")\n");
             pojo.append("\tprivate ").append(type).append(" ").append(convertToCamelCase(isSingleKey? "id" : col.getColumnName(), "_", false, "")).append(";\n\n");
         }
     }
@@ -231,11 +230,16 @@ public class POJOUtil {
         return table.contains(".") ? table.split("\\.")[1] : table;
     }
 
-    public static String getLength(String type, List<String> argumentsStringList) {
-        //Do this if long too?
+    public static void writeSizeAnnotation(StringBuffer pojo, String type, List<String> argumentsStringList) {
         if (!type.equals("String"))
-            return "";
-        return ", length = " + argumentsStringList.get(0).replaceAll(" BYTE", "");
+            return;
+        pojo.append("\t@Size(max = " + argumentsStringList.get(0).replaceAll(" BYTE", "") + ")\n");
+    }
+
+    public static void writeDigitsAnnotation(StringBuffer pojo, String type, List<String> argumentsStringList) {
+        if ((!type.equals("BigDecimal") && !type.equals("Long"))|| argumentsStringList == null || argumentsStringList.size() != 2)
+            return;
+        pojo.append("\t@Digits(integer = " +  argumentsStringList.get(0) + ", fraction = " + argumentsStringList.get(1) + ")\n");
     }
 
     public static String getPrecisionScale(String type, List<String> argumentsStringList) {
