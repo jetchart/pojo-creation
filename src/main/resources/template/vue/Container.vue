@@ -26,10 +26,11 @@
 
     export default {
         name: 'Container::name::',
-        props: ['editable'],
+        //props: ['editable'],
         components: {Lista::name::, Alta::name::, },
         data() {
             return {
+                editable: true,
                 component: 'Lista::name::',
                 loadingSave: false,
                 selected: null,
