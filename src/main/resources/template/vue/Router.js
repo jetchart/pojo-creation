@@ -1,8 +1,8 @@
-import ::name:: from './components/::name::'
+import Container::name:: from './components/Container::name::'
 ...
 {
-    name: '::name::',
+    name: 'Container::name::',
         path: '/::name_lower::',
-    component: ::name::
+    component: Container::name::
 },
 ...
