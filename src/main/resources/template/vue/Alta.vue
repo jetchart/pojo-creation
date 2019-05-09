@@ -2,28 +2,22 @@
     <div>
         <template>
             <div class="row">
-                <div class="col-md-3 col-sm-12 col-bottom">
+                <div class="col-md-4 col-sm-12 col-bottom">
                     <b-card-text>
                         <span>Campo 1</span>
                         <b-form-input type="text" v-model="registroNew.campo1"></b-form-input>
                     </b-card-text>
                 </div>
-                <div class="col-md-3 col-sm-12 col-bottom">
+                <div class="col-md-4 col-sm-12 col-bottom">
                     <b-card-text>
                         <span>Campo 2</span>
                         <b-form-input type="text" v-model="registroNew.campo2"></b-form-input>
                     </b-card-text>
                 </div>
-                <div class="col-md-3 col-sm-12 col-bottom">
+                <div class="col-md-4 col-sm-12 col-bottom">
                     <b-card-text>
                         <span>Campo 3</span>
                         <b-form-input type="text" v-model="registroNew.campo3"></b-form-input>
-                    </b-card-text>
-                </div>
-                <div class="col-md-3 col-sm-12 col-bottom">
-                    <b-card-text>
-                        <span>Campo 4</span>
-                        <b-form-input type="text" v-model="registroNew.campo4"></b-form-input>
                     </b-card-text>
                 </div>
             </div>
@@ -90,7 +84,7 @@
     }
 
     .btn-alta {
-        width: 8rem;
+        width: 5rem;
     }
 
 </style>

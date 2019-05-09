@@ -37,13 +37,14 @@ public class ABMUtil {
         System.out.println(layer + " created!");
     }
 
-    private static void createVueLayer(String name, ClassLoader classLoader, String layer, String extension, String folderTarget) {
+    private static void createVueLayer(String name, ClassLoader classLoader, String layer, String extension, Boolean joinLayerFileName, String folderTarget) {
+        String finalName = joinLayerFileName ? layer + name : layer;
         String layerContent = FileUtil.readResource(classLoader,"template/vue/" + layer + extension);
         layerContent = layerContent.replaceAll("::name::", name);
         layerContent = layerContent.replaceAll("::name_lower::", firstLower(name));
         String folderPath = folderTarget + "\\";
         FileUtil.createFolder(folderPath);
-        FileUtil.writeFile(folderPath + layer + name + extension, layerContent);
+        FileUtil.writeFile(folderPath + finalName + extension, layerContent);
         System.out.println(layer + " created!");
     }
 
@@ -56,11 +57,11 @@ public class ABMUtil {
         folderTarget = folderTarget.endsWith("/") || folderTarget.endsWith("\\") ? folderTarget : folderTarget + "\\";
 
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        createVueLayer(name, classLoader, "Container", ".vue", folderTarget);
-        createVueLayer(name, classLoader, "Lista", ".vue", folderTarget);
-        createVueLayer(name, classLoader, "Detalle", ".vue", folderTarget);
-        createVueLayer(name, classLoader, "Alta", ".vue", folderTarget);
-        createVueLayer(name, classLoader, "Service", ".js", folderTarget);
-        createVueLayer(name, classLoader, "Router", ".js", folderTarget);
+        createVueLayer(name, classLoader, "Container", ".vue", true, folderTarget);
+        createVueLayer(name, classLoader, "Lista", ".vue", true, folderTarget);
+        createVueLayer(name, classLoader, "Detalle", ".vue", true, folderTarget);
+        createVueLayer(name, classLoader, "Alta", ".vue", true, folderTarget);
+        createVueLayer(name, classLoader, "Service", ".js", true, folderTarget);
+        createVueLayer(name, classLoader, "router", ".js", false, folderTarget);
     }
 }
