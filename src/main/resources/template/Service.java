@@ -1,4 +1,4 @@
-package FILL_PACKAGE_PATH_HERE;
+package FILL_SERVICE_PACKAGE_PATH_HERE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package FILL_PACKAGE_PATH_HERE;
+package FILL_CONTROLLER_PACKAGE_PATH_HERE;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

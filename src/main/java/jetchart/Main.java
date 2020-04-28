@@ -4,12 +4,13 @@ import jetchart.utils.ABMUtil;
 import jetchart.utils.FileUtil;
 import jetchart.utils.POJOUtil;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         System.out.println("Example command line to view help: help");
         System.out.println("Example command line to create POJO: pojo /home/jetchart/person.sql /home/jetchart/pojos/");
         System.out.println("Example command line to create ABM: abm Person PersonEntity PersonDto Long /home/jetchart/layers/ \n");
@@ -36,7 +37,7 @@ public class Main {
             showHelp();
     }
 
-    private static void commandLine(String[] args) {
+    private static void commandLine(String[] args) throws URISyntaxException {
         if (args[0].toUpperCase().equals("HELP")) {
             showHelp();
         }
@@ -77,7 +78,7 @@ public class Main {
         filesPath.forEach(filePath -> POJOUtil.createPOJO(filePath, pathTo));
     }
 
-    private static void ABMOptions() {
+    private static void ABMOptions() throws URISyntaxException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Layers name (example: Person): ");
         String name = scanner.next();

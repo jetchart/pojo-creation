@@ -1,9 +1,8 @@
 package jetchart.utils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,23 @@ public class FileUtil {
         return content;
     }
 
+    public static String readResource(ClassLoader classLoader, String path) {
+        InputStream in = classLoader.getResourceAsStream(path);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        return reader.lines().collect(Collectors.joining("\n"));
+    }
+
+    public static String readFile(Path path) {
+        String content = "";
+        try {
+            content = new String ( Files.readAllBytes( path ) );
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
+    }
+
     public static void writeFile(String path, String content) {
         try {
             FileWriter myWriter = new FileWriter(path);
@@ -47,4 +63,9 @@ public class FileUtil {
         }
     }
 
+    public static void createFolder(String folderPath) {
+        File folder = new File(folderPath);
+        if (!folder.exists())
+            folder.mkdirs();
+    }
 }

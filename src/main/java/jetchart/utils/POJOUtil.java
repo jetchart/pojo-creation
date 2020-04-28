@@ -59,7 +59,7 @@ public class POJOUtil {
 
             writeEndClassSection(pojo);
 
-            String fileName = convertToCamelCase(tableName, "_", true, "") + ".java";
+            String fileName = convertToCamelCase(tableName, "_", true, "") + "Entity.java";
             FileUtil.writeFile(pathTo + fileName, pojo.toString());
             System.out.println("POJO created: " + fileName);
 
@@ -180,7 +180,7 @@ public class POJOUtil {
 
     public static void writeNotNullableAnnotation(StringBuffer pojo, ColumnDefinition col) {
         if (ifNotNullable(col.getColumnSpecStrings()))
-            pojo.append("\t@NotNullable\n");
+            pojo.append("\t@NotNull\n");
     }
 
     public static void writeIdAnnotation(StringBuffer pojo, List<String> keys, ColumnDefinition col) {
@@ -195,7 +195,7 @@ public class POJOUtil {
     }
 
     public static void writeImportSection(StringBuffer pojo) {
-        pojo.append("import javax.persistence.*;\n\n");
+        pojo.append("import javax.persistence.*;\nimport javax.validation.constraints.NotNull;\nimport java.util.Date;\n\n");
     }
 
     public static void writePackageSection(StringBuffer pojo) {

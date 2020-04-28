@@ -1,4 +1,4 @@
-package FILL_PACKAGE_PATH_HERE;
+package FILL_BUSINESS_PACKAGE_PATH_HERE;
 
 import org.springframework.stereotype.Component;
 

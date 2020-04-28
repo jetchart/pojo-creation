@@ -1,5 +1,10 @@
 package jetchart.utils;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
 public class ABMUtil {
 
     public static void createABM(String name, String entity, String dto, String typeId, String folderTarget) {
@@ -20,13 +25,15 @@ public class ABMUtil {
             dto = name + "Dto";
         if (typeId == null || typeId.isEmpty())
             typeId = "Long";
-        String path = classLoader.getResource("template/" + layer + ".java").getFile().replaceFirst("/", "");
-        String layerContent = FileUtil.readFile(path);
+
+        String layerContent = FileUtil.readResource(classLoader,"template/" + layer + ".java");
         layerContent = layerContent.replaceAll("::NAME::", name);
         layerContent = layerContent.replaceAll("::ENTITY::", entity);
         layerContent = layerContent.replaceAll("::DTO::", dto);
         layerContent = layerContent.replaceAll("::TYPEID::", typeId);
-        FileUtil.writeFile(folderTarget + name + layer + ".java", layerContent);
+        String folderPath = folderTarget + layer.toLowerCase() + "\\";
+        FileUtil.createFolder(folderPath);
+        FileUtil.writeFile(folderPath + name + layer + ".java", layerContent);
         System.out.println(layer + " created!");
     }
 
