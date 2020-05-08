@@ -37,4 +37,29 @@ public class ABMUtil {
         System.out.println(layer + " created!");
     }
 
+    private static void createVueLayer(String name, ClassLoader classLoader, String layer, String extension, String folderTarget) {
+        String layerContent = FileUtil.readResource(classLoader,"template/vue/" + layer + extension);
+        layerContent = layerContent.replaceAll("::name::", name);
+        layerContent = layerContent.replaceAll("::name_lower::", firstLower(name));
+        String folderPath = folderTarget + "\\";
+        FileUtil.createFolder(folderPath);
+        FileUtil.writeFile(folderPath + layer + name + extension, layerContent);
+        System.out.println(layer + " created!");
+    }
+
+    private static String firstLower(String name) {
+        return name.substring(0, 1).toLowerCase() + name.substring(1, name.length() - 1);
+    }
+
+    public static void createVueABM(String name, String folderTarget) {
+        folderTarget = folderTarget == null || folderTarget.isEmpty() ? "./" : folderTarget;
+        folderTarget = folderTarget.endsWith("/") || folderTarget.endsWith("\\") ? folderTarget : folderTarget + "\\";
+
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        createVueLayer(name, classLoader, "Container", ".vue", folderTarget);
+        createVueLayer(name, classLoader, "Lista", ".vue", folderTarget);
+        createVueLayer(name, classLoader, "Ver", ".vue", folderTarget);
+        createVueLayer(name, classLoader, "Alta", ".vue", folderTarget);
+        createVueLayer(name, classLoader, "Service", ".js", folderTarget);
+    }
 }

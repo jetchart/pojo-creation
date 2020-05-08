@@ -14,6 +14,7 @@ public class Main {
         System.out.println("Example command line to view help: help");
         System.out.println("Example command line to create POJO: pojo /home/jetchart/person.sql /home/jetchart/pojos/");
         System.out.println("Example command line to create ABM: abm Person PersonEntity PersonDto Long /home/jetchart/layers/ \n");
+        System.out.println("Example command line to create Vue ABM: vue-abm Person /home/jetchart/layers/ \n");
 
         if (args != null && args.length > 0 && args[0] != null) {
             commandLine(args);
@@ -23,6 +24,7 @@ public class Main {
         System.out.println("Select one:");
         System.out.println("\t1. POJO");
         System.out.println("\t2. ABM");
+        System.out.println("\t3. Vue ABM");
         System.out.println("\t3. Help POJO");
         System.out.print("Option: ");
         Scanner scanner = new Scanner(System.in);
@@ -34,7 +36,18 @@ public class Main {
         if (option.equals("2"))
             ABMOptions();
         if (option.equals("3"))
+            VueABMOptions();
+        if (option.equals("4"))
             showHelp();
+    }
+
+    private static void VueABMOptions() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Layers name (example: Person): ");
+        String name = scanner.next();
+        System.out.print("Target folder: ");
+        String folder = scanner.next();
+        ABMUtil.createVueABM(name, folder);
     }
 
     private static void commandLine(String[] args) throws URISyntaxException {
