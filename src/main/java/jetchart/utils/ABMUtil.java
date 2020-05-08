@@ -48,7 +48,7 @@ public class ABMUtil {
     }
 
     private static String firstLower(String name) {
-        return name.substring(0, 1).toLowerCase() + name.substring(1, name.length() - 1);
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 
     public static void createVueABM(String name, String folderTarget) {
@@ -61,5 +61,6 @@ public class ABMUtil {
         createVueLayer(name, classLoader, "Ver", ".vue", folderTarget);
         createVueLayer(name, classLoader, "Alta", ".vue", folderTarget);
         createVueLayer(name, classLoader, "Service", ".js", folderTarget);
+        createVueLayer(name, classLoader, "Router", ".js", folderTarget);
     }
 }
