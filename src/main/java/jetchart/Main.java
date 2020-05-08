@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException {
         System.out.println("Example command line to view help: help");
         System.out.println("Example command line to create POJO: pojo /home/jetchart/person.sql /home/jetchart/pojos/");
-        System.out.println("Example command line to create ABM: abm Person PersonEntity PersonDto Long /home/jetchart/layers/ \n");
+        System.out.println("Example command line to create ABM: abm Person PersonEntity PersonDto Long /home/jetchart/layers/");
         System.out.println("Example command line to create Vue ABM: vue-abm Person /home/jetchart/layers/ \n");
 
         if (args != null && args.length > 0 && args[0] != null) {
