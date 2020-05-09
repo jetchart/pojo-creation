@@ -1,16 +1,16 @@
 <template>
 <div>
-    <div class="row">
+    <div class="row v-align">
 		<!-- Búsqueda -->
-		<div class="col-md-2 mg-bottom">
+		<div class="col-md-2 mg-bottom align="left">
             <h5 class="tacum inlineb">Filtro</h5>
             <b-input v-model="filtro"></b-input>
 		</div>
-		<!-- Agregar/Eliminar todo -->
-		<div class="col mg-bottom" align="right">
-			<b-button class="fa fa-trash btn-danger" @click="showModalEliminarTodo()"></b-button>
-			<b-button class="fa fa-plus btn-success" @click="crear()"></b-button>
-		</div>
+        <!-- Agregar/Eliminar -->
+        <div class="col mg-bottom" align="right">
+            <b-button class="fa fa-trash btn-danger" @click="showModalEliminarTodo()"></b-button>
+            <b-button class="fa fa-plus btn-success" @click="crear()"></b-button>
+        </div>
     </div>
     <!-- Tabla -->
     <div class="row">
@@ -19,16 +19,20 @@
           <table class="table table-striped">
             <thead>
               <tr class="text-center">
-                <th>Id</th>
+                <th>Campo 1</th>
+                <th>Campo 2</th>
+                <th>Campo 3</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               <template v-if="totalRegistros > 0 && !loading">
                 <tr v-for="(registro, index) in registros" :key="index">
-                  <td class="text-center">{{registro.id}}</td>
+                  <td class="text-center">{{registro.campo1}}</td>
+                  <td class="text-center">{{registro.campo2}}</td>
+                  <td class="text-center">{{registro.campo3}}</td>
                   <td class="text-center">
-                    <button class="btn fa fa-align-justify pointer" @click="ver(registro)"></button>
+                    <button class="btn fa fa-align-justify pointer" @click="verDetalle(registro)"></button>
                     <button class="btn fa fa-edit pointer" @click="editar(registro)"></button>
                     <button class="btn fa fa-trash pointer" @click="showModalEliminar(registro)"></button>
                   </td>
@@ -60,9 +64,9 @@
       ></b-pagination>
       </div>
     </div>
-    <!-- Modal Ver -->
-    <b-modal ref="modalVer" centered ok-only ok-title="Cerrar" size="lg">
-        <Ver::name:: :registro="registroSelected"></Ver::name::>
+    <!-- Modal Detalle -->
+    <b-modal ref="modalDetalle" title="Detalle" centered ok-only ok-title="Cerrar" size="lg">
+        <Detalle::name:: :registro="registroSelected"></Detalle::name::>
     </b-modal>
     <!-- Modal eliminar un registro -->
     <b-modal centered ref="modalEliminar" title="Eliminar registro" @ok="eliminar()">
@@ -80,7 +84,7 @@
 
     import { ::name::Service } from '@/js/services/::name::Service';
     import {mapState, mapActions, mapMutations} from 'vuex'
-    import Ver::name:: from "@/components/::name_lower::/Ver::name::";
+    import Detalle::name:: from "@/components/::name_lower::/Detalle::name::";
 
     export default {
         name: 'Lista::name::',
@@ -97,7 +101,7 @@
                 numRows: 30,
             }
         },
-        components: { Ver::name::, },
+        components: { Detalle::name::, },
         mounted() {
             this.lists();
         },
@@ -118,9 +122,9 @@
             editar(registro) {
               this.$emit('edit', registro);
             },
-            ver(registro) {
+            verDetalle(registro) {
               this.registroSelected = registro;
-              this.$refs.modalVer.show();
+              this.$refs.modaDetalle.show();
             },
             deleteAll() {
               this.loading = true;
@@ -162,10 +166,6 @@
                     .catch(error => {
                         this.loading = false;
                     });
-            },
-            verRegistro(registro) {
-                this.registro = registro;
-                this.$refs.modalVer.show();
             },
         },
         watch: {
@@ -219,6 +219,10 @@
 
 .pointer {
   cursor: pointer;
+}
+
+.v-align {
+    align-items: center;
 }
 
 

@@ -29,9 +29,9 @@
             </div>
             <div class="row">
                 <div class="col-md-12" align="right">
-                    <b-button v-show="editable" v-if="!loadingSave" class="btn-sm card-bottom" type="submit" variant="primary" @click="save();">Guardar</b-button>
-                    <b-button v-show="editable" v-else class="btn-sm card-bottom loading"><i class="fa fa-spinner fa-spin"></i></b-button>
-                    <b-button v-show="editable" class="btn-sm card-bottom" type="submit" variant="primary" @click="$emit('cancel')">Cancelar</b-button>
+                    <b-button v-show="editable" v-if="!loadingSave" class="btn-sm card-bottom btn-alta" type="submit" variant="primary" @click="save();">Guardar</b-button>
+                    <b-button v-show="editable" v-else class="btn-sm card-bottom btn-alta" ><i class="fa fa-spinner fa-spin"></i></b-button>
+                    <b-button v-show="editable" class="btn-sm card-bottom btn-alta" type="submit" variant="primary" @click="$emit('cancel')">Cancelar</b-button>
                 </div>
             </div>
         </template>
@@ -64,7 +64,7 @@
             save() {
                 this.loadingSave = true;
                 let params = { cuit: this.relationSelected.id, };
-                ::name::Service.baseActions().save$(this.registroNew, params)
+                ::name::Service.baseActions().saveOrUpdate$(this.registroNew, params)
                     .then(response => {
                         this.$emit('saved', response.data);
                         this.loadingSave = false;
@@ -76,6 +76,7 @@
 </script>
 
 <style scoped>
+
     .card-bottom {
     margin-bottom: 1.25rem;
     }
@@ -85,6 +86,11 @@
     }
 
     .col-bottom {
-    margin-bottom: 1rem;
+        margin-bottom: 1rem;
     }
+
+    .btn-alta {
+        width: 8rem;
+    }
+
 </style>

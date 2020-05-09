@@ -1,16 +1,17 @@
 <template>
-    <div>
-		<h4>::name::</h4><hr>
-        <b-card body-class="text-left" header-tag="nav" class="card-bottom">
-            <component v-bind:is="component" 
-            :registro="registro" 
-            :editable="editable" 
-            @edit="edit($event)"
-            @cancel="cancel()"
-            @saved="applySaved($event)"
-            @sendTotalRegistros="sendTotalRegistros($event)"
-            ></component>
-        </b-card>
+    <div class="container">
+        <div align="left">
+            <h4>::name::</h4>
+            <hr>
+        </div>
+        <component v-bind:is="component"
+        :registro="registro"
+        :editable="editable"
+        @edit="edit($event)"
+        @cancel="cancel()"
+        @saved="applySaved($event)"
+        @sendTotalRegistros="sendTotalRegistros($event)"
+        ></component>
         <!-- Modal guardado -->
         <b-modal ref="modalSuccess" title="Registro guardado" centered ok-only ok-title="Cerrar">
             El registro ha sido guardado correctamente

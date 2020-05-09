@@ -58,7 +58,7 @@ public class ABMUtil {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         createVueLayer(name, classLoader, "Container", ".vue", folderTarget);
         createVueLayer(name, classLoader, "Lista", ".vue", folderTarget);
-        createVueLayer(name, classLoader, "Ver", ".vue", folderTarget);
+        createVueLayer(name, classLoader, "Detalle", ".vue", folderTarget);
         createVueLayer(name, classLoader, "Alta", ".vue", folderTarget);
         createVueLayer(name, classLoader, "Service", ".js", folderTarget);
         createVueLayer(name, classLoader, "Router", ".js", folderTarget);

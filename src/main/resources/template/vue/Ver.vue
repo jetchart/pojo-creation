@@ -3,8 +3,20 @@
         <div class="row">
             <div class="col-md-4 col-sm-12 col-bottom">
                 <b-card-text>
-                    <span><b>Id</b></span>
-                    <p>{{registro.id}}</p>
+                    <span><b>Campo 1</b></span>
+                    <p>{{registro.campo1}}</p>
+                </b-card-text>
+            </div>
+            <div class="col-md-4 col-sm-12 col-bottom">
+                <b-card-text>
+                    <span><b>Campo 2</b></span>
+                    <p>{{registro.campo2}}</p>
+                </b-card-text>
+            </div>
+            <div class="col-md-4 col-sm-12 col-bottom">
+                <b-card-text>
+                    <span><b>Campo 3</b></span>
+                    <p>{{registro.campo3}}</p>
                 </b-card-text>
             </div>
         </div>
@@ -13,10 +25,10 @@
 
 <script>
 
-    import {mapState, mapActions, mapMutations} from 'vuex'
+    import {mapState, } from 'vuex'
 
     export default {
-        name: 'Ver::name::',
+        name: 'Detalle::name::',
         props: ['editable', 'registro'],
         data() {
             return {
